@@ -81,7 +81,7 @@ public class Boid : MonoBehaviour
 	void Update () {
 		
         // Get the list of nearby Boids (this Boid's neighbors)
-	    List<Boid> Neighbors = GetNeighbors(this);
+	    Neighbors = GetNeighbors(this);
         // ^6: GetNeighbors function is defined later in the code, it finds other Boids that are nearby
 
         // Initialize newVelocity and newPosition to the current values
@@ -101,7 +101,8 @@ public class Boid : MonoBehaviour
 	    Vector3 dist;
 	    if (CollisionRisk.Count > 0)
 	    {
-	        dist = GetAveragePosition(CollisionRisk) - this.transform.position;
+	        Vector3 collisionAveragePos = GetAveragePosition(CollisionRisk);
+            dist = collisionAveragePos - this.transform.position;
 	        NewVelocity += dist * BoidSpawner.S.CollisionAvoidanceAmt;
 	    }
 
@@ -115,7 +116,7 @@ public class Boid : MonoBehaviour
         // Avoid the mouse if it is too close
 	    else
 	    {
-	        NewVelocity += dist.normalized * BoidSpawner.S.MouseAvoidanceDist * BoidSpawner.S.MouseAvoidanceAmt;
+	        NewVelocity -= dist.normalized * BoidSpawner.S.MouseAvoidanceDist * BoidSpawner.S.MouseAvoidanceAmt;
 	    }
 
         // newVelocity and newPosition are ready, but wait unitl LateUpdate() 
@@ -169,8 +170,9 @@ public class Boid : MonoBehaviour
         Neighbors.Clear();
         CollisionRisk.Clear();
 
-        foreach (var boid in Boids)
+        foreach (Boid boid in Boids)
         {
+            if(boid == boi) continue;
             delta = boid.transform.position - boi.transform.position;
             dist = delta.magnitude;
 
@@ -200,7 +202,7 @@ public class Boid : MonoBehaviour
     public Vector3 GetAveragePosition(List<Boid> someBoids)
     {
         Vector3 sum = Vector3.zero;
-        foreach (var boid in someBoids)
+        foreach (Boid boid in someBoids)
         {
             sum += boid.transform.position;
         }
@@ -214,7 +216,7 @@ public class Boid : MonoBehaviour
     public Vector3 GetAverageVelocity(List<Boid> someBoids)
     {
         Vector3 sum = Vector3.zero;
-        foreach (var boid in someBoids)
+        foreach (Boid boid in someBoids)
         {
             sum += boid.Velocity;
         }
