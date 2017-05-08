@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Permissions;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Apple : MonoBehaviour
 {
@@ -20,11 +21,16 @@ public class Apple : MonoBehaviour
 	    {
 	        Destroy(this.gameObject);
 
-            // Get the reference from the main camera with the ApplePicker script
-	        ApplePicker apPicker = Camera.main.GetComponent<ApplePicker>();
+	        Scene scene = SceneManager.GetActiveScene();
+	        if (scene.name != "_Scene_Start" && scene.name != "_Scene_Over")
+	        {
+                // Get the reference from the main camera with the ApplePicker script
+                ApplePicker apPicker = Camera.main.GetComponent<ApplePicker>();
 
-	        // Call the AppleDestroyed() function of the ApplePicker script
-	        apPicker.AppleDestroyed();
+                // Call the AppleDestroyed() function of the ApplePicker script
+                apPicker.AppleDestroyed();
+            }
+
 	    }
 
 	}

@@ -37,7 +37,7 @@ public class HighScore : MonoBehaviour
         gt.text = "HighScore: " + Score;
 
         // Update the high score in the PlayerPrefs if current high score is higher
-        if (Score > PlayerPrefs.GetInt("ApplePickerHighScore")) ;
+        if (Score > PlayerPrefs.GetInt("ApplePickerHighScore"))
 	    {
 	        PlayerPrefs.SetInt("ApplePickerHighScore", Score);
 	    }
