@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class Basket : MonoBehaviour {
 
     public Text ScoreText;
+    static public int NewScore;
 
 
     // Use this for initialization
@@ -17,7 +18,7 @@ public class Basket : MonoBehaviour {
         
         // Initialize it to 0 at start
 	    ScoreText = scoreCounter.GetComponent<Text>();
-	    ScoreText.text = "0";
+	    ScoreText.text = "Green: 0";
 
 
 
@@ -41,7 +42,24 @@ public class Basket : MonoBehaviour {
 	    basketPosVector3.x = mousePos3d.x;
 	    this.gameObject.transform.position = basketPosVector3;
 
-	}
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
+        {
+            // Get movement of the finger since last frame
+            Vector3 touchDeltaPosition = Input.GetTouch(0).position;
+
+
+            touchDeltaPosition.z = -Camera.main.transform.position.z;
+
+            Vector3 touchPos3d = Camera.main.ScreenToWorldPoint(touchDeltaPosition);
+
+            // Move object across XY plane
+            Vector3 touchBasketVector3 = this.gameObject.transform.position;
+            touchBasketVector3.x = touchPos3d.x;
+            this.gameObject.transform.position = touchBasketVector3;
+
+        }
+
+    }
 
     // Collision Check with the Apple 
     void OnCollisionEnter(Collision coll)
@@ -56,12 +74,11 @@ public class Basket : MonoBehaviour {
         }
 
         // Parse the text from the scoreCounter
-        int newScore = Int32.Parse(ScoreText.text);
-        newScore += 100;
-        ScoreText.text = newScore.ToString();
+        NewScore += 1;
+        ScoreText.text = "Green: " + NewScore.ToString();
 
         // if the current score is higher than old one ,replace it
-        if (HighScore.Score < newScore)
-            HighScore.Score = newScore;
+        if (HighScore.Score < NewScore)
+            HighScore.Score = NewScore;
     }
 }

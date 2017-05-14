@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class HighScore : MonoBehaviour
 {
 
-    public static int Score = 1000;
+    public static int Score = 100;
 
     // Initialize the score from the PlayerPrefs if it exists
     void Awake()

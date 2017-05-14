@@ -13,10 +13,15 @@ public class Start_Game : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-	    if (Input.GetKeyUp(KeyCode.Return))
+	    if (Input.GetKeyUp(KeyCode.Mouse0))
 	    {
 	        SceneManager.LoadScene("_Scene_0");
 	    }
-		
-	}
+
+        if (Input.touchCount > 0)
+        {
+            SceneManager.LoadScene("_Scene_0");
+        }
+
+    }
 }

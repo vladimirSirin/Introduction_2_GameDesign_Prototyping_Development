@@ -11,9 +11,19 @@ public class ApplePicker : MonoBehaviour
     public float BasketBottomY = -14f;
     public float BasketSpacingY = 2f;
     public List<GameObject> BasketList;
+    public GameObject AppleTree_A;
+    public GameObject AppleTree_B;
+    public GameObject AppleTree_Uni;
+    static public int NumTrees = 1;
+    public int DifficultyGate_01 = 50;
+    public int DifficultyGate_02 = 100;
+    public int DifficultyGate_03 = 240;
 
     // Use this for initialization
-    void Start () {
+    void Start ()
+    {
+
+        Instantiate(AppleTree_A);
 
         BasketList.Clear();
         for (int i = 0; i < NumBasket; i++)
@@ -31,9 +41,28 @@ public class ApplePicker : MonoBehaviour
 	}
 	
 	// Update is called once per frame
+
 	void Update () {
-		
-	}
+
+	    if (Basket.NewScore > DifficultyGate_01 && NumTrees == 1)
+	    {
+	        Instantiate(AppleTree_B);
+	        NumTrees = 2;
+	    }
+	    else if (Basket.NewScore > DifficultyGate_02 && NumTrees == 2)
+	    {
+	        Instantiate(AppleTree_Uni);
+	        NumTrees = 3;
+	    }
+
+        else if (Basket.NewScore > DifficultyGate_03 && NumTrees == 3)
+        {
+            Instantiate(AppleTree_A);
+            Instantiate(AppleTree_B);
+            NumTrees = 4;
+        }
+
+    }
 
     // Public Function of AppleDestroyed
     public void AppleDestroyed()
@@ -50,10 +79,10 @@ public class ApplePicker : MonoBehaviour
         BasketList.Remove(basketRemove);
         Destroy(basketRemove);
 
-        // Restart the game if the baskets have been run out of
+        // Go to the Game_over scene if the baskets have been run out of
         if (BasketList.Count == 0)
         {
-            SceneManager.LoadScene("_Scene_0");
+            SceneManager.LoadScene("_Scene_Over");
         }
     }
 }
