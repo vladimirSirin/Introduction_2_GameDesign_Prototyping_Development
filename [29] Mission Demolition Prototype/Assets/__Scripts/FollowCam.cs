@@ -31,12 +31,35 @@ public class FollowCam : MonoBehaviour
 	}
 	
 	// Update is called once per frame
-	void FixedUpdate () {
-        // if there's only one line following an if, it doesn't need braces
-	    if (poi == null) return; // return if there is no poi
+	void FixedUpdate ()
+	{
 
-        // Get the position of the poi
-	    Vector3 destination = poi.transform.position;
+	    Vector3 destination;
+
+        // If there is no POI, return to P:[0,0,0]
+
+
+        // if there's only one line following an if, it doesn't need braces
+	    if (poi == null) // return if there is no poi
+	        destination = Vector3.zero;
+	    else
+	    {
+            // Get the position of the poi
+            destination = poi.transform.position;
+
+            // IF pos is a projectile, check to see if it's at rest
+	        if (poi.tag == "Projectile")
+	        {
+	            // If it is sleeping , that is not moving
+	            if (poi.GetComponent<Rigidbody>().IsSleeping())
+	            {
+	                // return to default view in the next update
+	                poi = null;
+	                return;
+	            }
+	        }
+        }
+
 
         // LImit the X and Y to minimum values
 	    destination.x = Mathf.Max(minXY.x, destination.x);
