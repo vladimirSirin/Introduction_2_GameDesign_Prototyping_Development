@@ -17,11 +17,13 @@ public class Hero : MonoBehaviour
     public float ShieldLevel = 1;
 
     public bool _______________________________________________;
+    public Bounds Bounds;
 
     // Awake
     void Awake()
     {
         S = this; // Set the Singleton
+        Bounds = Utils.CombineBoundsOfChildren(this.gameObject);
     }
 
 	// Use this for initialization
