@@ -2,6 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This is actually outside the Utils class
+public enum BoundsTest
+{
+    centre, //is the centre of the gameOBject on screen?
+    onScreen, //Are the bounds entirely on screen?
+    offScreen, // Are the bounds entirely off screen?
+}
+
+
 public class Utils : MonoBehaviour
 {
     // ================================== Bounds Functions ======================================\\
@@ -30,15 +39,15 @@ public class Utils : MonoBehaviour
         // If this GameObject has a Renderer Component...
         if (go.GetComponent<Renderer>() != null)
             // Expand b to contain the Renderer Component
-            BoundsUnion(b, go.GetComponent<Renderer>().bounds);
+            b = BoundsUnion(b, go.GetComponent<Renderer>().bounds);
         // If this GameObject has a Collider Component...
         if (go.GetComponent<Collider>() != null)
             // Expand b to contain the Collider's Bounds
-            BoundsUnion(b, go.GetComponent<Collider>().bounds);
+            b = BoundsUnion(b, go.GetComponent<Collider>().bounds);
         // Recursively iterate through each child of this GameObject.transform
         foreach (Transform t in go.transform)
             // Expand b to contain their bounds as well
-            BoundsUnion(b, CombineBoundsOfChildren(t.gameObject));
+            b = BoundsUnion(b, CombineBoundsOfChildren(t.gameObject));
 
         return (b);
     }
@@ -91,6 +100,141 @@ public class Utils : MonoBehaviour
         _camBounds.Encapsulate(boundBRN);
         _camBounds.Encapsulate(boundTLN);
     }
+
+    // Checks to see whether the bounds bnd are within the camera bounds
+    public static Vector3 ScreenBoundsCheck(Bounds bnd, BoundsTest test = BoundsTest.centre)
+    {
+        return BoundsInBoundsCheck(CamBounds, bnd, test);
+    }
+
+
+    // Checks to see whether Bounds lilB are within Bound bigB
+    public static Vector3 BoundsInBoundsCheck(Bounds bigB, Bounds lilB, BoundsTest test = BoundsTest.onScreen)
+    {
+        // The behaviour of the function will change based on the BoundsTest
+
+        // Get the centre of the lilB
+        Vector3 posLilBCenter = lilB.center;
+
+        // Initialize the offset
+        Vector3 off = Vector3.zero;
+
+        // Switch between three cases, is centre within the bigB? is all of lilB within? is any of lilB within?
+        switch (test)
+        {
+                case BoundsTest.centre:
+                    // The centre test determine what off would have to be applied to lilB to move the its center back into BigB
+                    if (bigB.Contains(posLilBCenter))
+                    {
+                        return Vector3.zero;
+                    }
+
+                    if (posLilBCenter.x > bigB.max.x)
+                    {
+                        off.x = posLilBCenter.x - bigB.max.x;
+                    }
+                    else if (posLilBCenter.x < bigB.min.x)
+                    {
+                        off.x = posLilBCenter.x - bigB.min.x;
+                    }
+
+                    if (posLilBCenter.y > bigB.max.y)
+                    {
+                        off.y = posLilBCenter.y - bigB.max.y;
+                    }
+                    else if (posLilBCenter.y < bigB.min.y)
+                    {
+                        off.y = posLilBCenter.y - bigB.min.y;
+                    }
+
+                    if (posLilBCenter.z > bigB.max.z)
+                    {
+                        off.z = posLilBCenter.z - bigB.max.z;
+                    }
+                    else if (posLilBCenter.z < bigB.min.z)
+                    {
+                        off.z = posLilBCenter.z - bigB.min.z;
+                    }
+
+                    return off;
+
+
+
+                case BoundsTest.onScreen:
+                    // The on screen test determine what off would have to be applied to lilB to keep all of lilB inside bigB
+                    if (bigB.Contains(lilB.max) && bigB.Contains(lilB.min))
+                    {
+                        return Vector3.zero;
+                    }
+
+                    if (lilB.max.x > bigB.max.x)
+                    {
+                        off.x = lilB.max.x - bigB.max.x;
+                    }
+                    else if (lilB.min.x < bigB.min.x)
+                    {
+                        off.x = lilB.min.x - bigB.min.x;
+                    }
+
+                    if (lilB.max.y > bigB.max.y)
+                    {
+                        off.y = lilB.max.y - bigB.max.y;
+                    }
+                    else if (lilB.min.y < bigB.min.y)
+                    {
+                        off.y = lilB.min.y - bigB.min.y;
+                    }
+
+                    if (lilB.max.z > bigB.max.z)
+                    {
+                        off.z = lilB.max.z - bigB.max.z;
+                    }
+                    else if (lilB.min.z < bigB.min.z)
+                    {
+                        off.z = lilB.min.z - bigB.min.z;
+                    }
+
+                    return off;
+
+                case BoundsTest.offScreen:
+                // the off screen test deternmine what off would need to be applied to move any tiny part of lilB inside of bigB
+                    if (bigB.Contains(lilB.max) || bigB.Contains(lilB.min))
+                    {
+                        return Vector3.zero;
+                    }
+
+                    if (lilB.min.x > bigB.max.x)
+                    {
+                        off.x = lilB.min.x - bigB.max.x;
+                    }
+                    else if (lilB.max.x < bigB.min.x)
+                    {
+                        off.x = lilB.max.x - bigB.min.x;
+                    }
+
+                    if (lilB.min.y > bigB.max.y)
+                    {
+                        off.y = lilB.min.y - bigB.max.y;
+                    }
+                    else if (lilB.max.y < bigB.min.y)
+                    {
+                        off.y = lilB.max.y - bigB.min.y;
+                    }
+
+                    if (lilB.min.z > bigB.max.z)
+                    {
+                        off.z = lilB.min.z - bigB.max.z;
+                    }
+                    else if (lilB.max.z < bigB.min.z)
+                    {
+                        off.z = lilB.max.z - bigB.min.z;
+                    }
+
+                    return off;
+        }
+        return (Vector3.zero);
+    }
+
 
 
 }
