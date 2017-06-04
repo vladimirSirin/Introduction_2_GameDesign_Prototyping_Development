@@ -27,8 +27,9 @@ public class Shield : MonoBehaviour
 	    {
 	        LevelShown = currLevel;
 	        // Adjust the Texture offset to show different shield levels
-            this.GetComponent<Material>().mainTextureOffset = new Vector2(0.2f * LevelShown, 0);
-	    }
+	        Material mat = this.GetComponent<Renderer>().material;
+	        mat.mainTextureOffset = new Vector2(0.2f * LevelShown, 0);
+        }
 
 
 

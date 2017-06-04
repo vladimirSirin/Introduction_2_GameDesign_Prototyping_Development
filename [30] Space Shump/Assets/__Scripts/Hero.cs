@@ -14,10 +14,25 @@ public class Hero : MonoBehaviour
     public float RollMult = -45;
 
     // ship status information
-    public float ShieldLevel = 1;
+    [SerializeField]
+    private float _shieldLevel = 1;
 
     public bool _______________________________________________;
     public Bounds Bounds;
+
+    // Properties
+    public float ShieldLevel
+    {
+        get { return _shieldLevel; }
+        set
+        {
+            _shieldLevel = Mathf.Min(4, value);
+            if (value < 0)
+            {
+                Destroy(this.gameObject);
+            }
+        }
+    }
 
     // Awake
     void Awake()
@@ -56,4 +71,43 @@ public class Hero : MonoBehaviour
 	    }
 
 	}
+
+
+    // The variable holds the object collide with the hero last time, make sure there is no duplication on hit
+    private GameObject _lastTriggerGameObject = null;
+
+    // On trigger Enter function
+    void OnTriggerEnter(Collider other)
+    {
+        // Find the parent object with a tag of the collier
+        GameObject parent = Utils.FindTaggedParent(other.gameObject);
+
+        // If there is a tag, annouce the parent
+        if (parent != null)
+        {
+            // Check if the collision go is the same as the last one
+            if (parent == _lastTriggerGameObject)
+            {
+                return;
+            }
+            _lastTriggerGameObject = parent;
+
+            // If it is the enemy. Decrease the sheild level of the hero and destroy the enemy
+            if (parent.tag == "Enemy")
+            {
+                this.ShieldLevel--;
+                Destroy(parent);
+            }
+            else
+            {
+                print("Triggered" + parent.name);
+            }
+        }
+
+        //Otherwise annouce the original name
+        else
+        {
+            print("Triggered" + other.gameObject.name);
+        }
+    }
 }

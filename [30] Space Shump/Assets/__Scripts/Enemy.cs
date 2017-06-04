@@ -14,6 +14,13 @@ public class Enemy : MonoBehaviour
     public bool _________________________________;
     public Bounds Boundbox; // the bounds of the enemy and his children
     public Vector3 CentreoffVector3; // the dist of bounds.centre from position
+    
+
+    //
+    void Awake()
+    {
+        InvokeRepeating("CheckOffscreen", 0f, 2.0f);
+    }
 
 	// Use this for initialization
 	void Start () {
@@ -37,6 +44,34 @@ public class Enemy : MonoBehaviour
     {
         get { return this.transform.position; }
         set { this.transform.position = value; }
+    }
+
+
+    public void CheckOffscreen()
+    {
+        // Check if the Bounds params are zero
+        if (Boundbox.size == Vector3.zero)
+        {
+            // If so, initialize the Boundbox with the utils functions
+            Boundbox = Utils.CombineBoundsOfChildren(this.gameObject);
+            // Calculate the offset of the position and Boundbox centre
+            CentreoffVector3 = Boundbox.center - this.transform.position;
+        }
+
+        // Caliberate the offset
+        Boundbox.center = CentreoffVector3 + this.transform.position;
+
+        // Check if this is off screen
+        Vector3 off = Utils.ScreenBoundsCheck(Boundbox, BoundsTest.offScreen);
+
+        // if so, destroy it.
+        if (off != Vector3.zero)
+        {
+            if (off.y < 0)
+            {
+                Destroy(this.gameObject);
+            }
+        }
     }
 }
 

@@ -235,6 +235,30 @@ public class Utils : MonoBehaviour
         return (Vector3.zero);
     }
 
+    // This function will iteratively climb up on the transfrom parent tree
+    // unitl it either find a object with a tag != untagged, or there is no parent to be found
+    public static GameObject FindTaggedParent(GameObject go)
+    {
+        // If this gameobject has a tag, return the go
+        if (go.tag != "Untagged")
+        {
+            return go;
+        }
 
+        // If there is no  parent anymore
+        if (go.transform.parent == null)
+        {
+            return null;
+        }
+
+        // keep iterate the parents
+        return FindTaggedParent(go.transform.parent.gameObject);
+    }
+
+    // The version of the function handles a transform istead of a game object
+    public static GameObject FindTaggedParent(Transform t)
+    {
+        return FindTaggedParent(t.gameObject);
+    }
 
 }
