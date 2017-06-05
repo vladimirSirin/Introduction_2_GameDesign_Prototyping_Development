@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Main : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class Main : MonoBehaviour
 
     public float EnemySpawnPerSecond = 0.5f;
     public float EnemySpawnPadding = 1.5f;
+    public WeaponDefinition[] WeaponDefinitions;
+    public WeaponType[] ActiveWeaponTypes;
 
     public bool _____________________________________;
 
@@ -36,6 +39,12 @@ public class Main : MonoBehaviour
 	// Use this for initialization
 	void Start () {
 		
+        ActiveWeaponTypes = new WeaponType[WeaponDefinitions.Length];
+	    for (int i = 0; i < WeaponDefinitions.Length; i++)
+	    {
+	        ActiveWeaponTypes[i] = WeaponDefinitions[i].type;
+	    }
+
 	}
 	
 	// Update is called once per frame
@@ -62,5 +71,18 @@ public class Main : MonoBehaviour
         // Invoke another spawn
         Invoke("SpawnEnemy", EnemySpawnRate);
 
+    }
+
+    // The restart game function
+    public void DelayGameRestart(float timeOfDelay)
+    {
+        // invoke the restart function
+        Invoke("Restart", timeOfDelay);
+    }
+
+    public void Restart()
+    {
+        // Reload the level to restart
+        SceneManager.LoadScene("__Scene_0");
     }
 }

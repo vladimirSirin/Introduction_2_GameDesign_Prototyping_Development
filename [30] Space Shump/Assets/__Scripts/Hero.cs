@@ -6,6 +6,7 @@ public class Hero : MonoBehaviour
 {
 
     static public Hero S; // Singleton
+    public float DelayRestart = 2.0f; // Set the time delay after hero died
     
     //  These fields control the movement of the help
     public float Speed = 30;
@@ -30,6 +31,7 @@ public class Hero : MonoBehaviour
             if (value < 0)
             {
                 Destroy(this.gameObject);
+                Main.S.DelayGameRestart(DelayRestart);
             }
         }
     }
