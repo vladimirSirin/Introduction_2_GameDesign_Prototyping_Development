@@ -7,13 +7,14 @@ public class Main : MonoBehaviour
 {
 
     static public Main S;
+    static public Dictionary<WeaponType, WeaponDefinition> W_DEFS;
 
     public GameObject[] PrefabEnemies; // the array of the enemy prefabs
 
     public float EnemySpawnPerSecond = 0.5f;
     public float EnemySpawnPadding = 1.5f;
     public WeaponDefinition[] WeaponDefinitions;
-    public WeaponType[] ActiveWeaponTypes;
+    public WeaponType[] activeWeaponTypes;
 
     public bool _____________________________________;
 
@@ -30,8 +31,16 @@ public class Main : MonoBehaviour
         // Calculate the enemy spawn rate
         EnemySpawnRate = 1.0f / EnemySpawnPerSecond;
 
+
         // Invoke the spawn Enemy function to spawn
         Invoke("SpawnEnemy", EnemySpawnRate);
+
+        // Initialize the dictionary of weapon definitions
+        W_DEFS = new Dictionary<WeaponType, WeaponDefinition>();
+        foreach (WeaponDefinition definition in WeaponDefinitions)
+        {
+            W_DEFS[definition.type] = definition;
+        }
 
 
     }
@@ -39,10 +48,10 @@ public class Main : MonoBehaviour
 	// Use this for initialization
 	void Start () {
 		
-        ActiveWeaponTypes = new WeaponType[WeaponDefinitions.Length];
+        activeWeaponTypes = new WeaponType[WeaponDefinitions.Length];
 	    for (int i = 0; i < WeaponDefinitions.Length; i++)
 	    {
-	        ActiveWeaponTypes[i] = WeaponDefinitions[i].type;
+	        activeWeaponTypes[i] = WeaponDefinitions[i].type;
 	    }
 
 	}
@@ -84,5 +93,21 @@ public class Main : MonoBehaviour
     {
         // Reload the level to restart
         SceneManager.LoadScene("__Scene_0");
+    }
+
+    // The use weapon type to get weapon definition function
+    public static WeaponDefinition GetWeaponDefinition(WeaponType wtType)
+    {
+        // Check to make sure that the key exist in the Dictionary
+        // Attempting to retrieve a key that did not exist would throw an error
+        // So the following if statement is important
+        if (W_DEFS.ContainsKey(wtType))
+        {
+            return (W_DEFS[wtType]);
+        }
+
+        // This will return a definition for Weapontype.none
+        // Which means it has failed to find the weapon definition
+        return new WeaponDefinition();
     }
 }
