@@ -21,6 +21,13 @@ public class Hero : MonoBehaviour
     public bool _______________________________________________;
     public Bounds Bounds;
 
+    // Declare a delegate type, weaponFireDelegate
+    public delegate void WeaponFireDelegate();
+
+    // Create a WeaponFireDelegate instance of the delegate for hero to call/fire
+    public WeaponFireDelegate FireDelegate;
+    
+
     // Properties
     public float ShieldLevel
     {
@@ -70,6 +77,12 @@ public class Hero : MonoBehaviour
 	    {
             pos -= off;
 	        transform.position = pos;
+	    }
+
+        // When the player press the "jump" button, the hero will fire (which is call FireDelegate function)
+	    if (Input.GetAxis("Jump") == 1 && FireDelegate != null)
+	    {
+	        FireDelegate();
 	    }
 
 	}
