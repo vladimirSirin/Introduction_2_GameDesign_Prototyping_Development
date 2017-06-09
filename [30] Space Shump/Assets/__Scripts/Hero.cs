@@ -80,7 +80,9 @@ public class Hero : MonoBehaviour
 	    }
 
         // When the player press the "jump" button, the hero will fire (which is call FireDelegate function)
-	    if (Input.GetAxis("Jump") == 1 && FireDelegate != null)
+	    float inputAxis = Input.GetAxis("Jump");
+        // print("Input is" + inputAxis);
+	    if (inputAxis == 1f && FireDelegate != null)
 	    {
 	        FireDelegate();
 	    }

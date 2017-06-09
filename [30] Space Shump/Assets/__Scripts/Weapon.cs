@@ -44,7 +44,7 @@ public class Weapon : MonoBehaviour {
     public static Transform PROJECTILE_ANCHOR;
 
     [SerializeField]
-    private WeaponType _type;
+    private WeaponType _type = WeaponType.blaster;
 
     public GameObject collar;
     public WeaponDefinition def;
@@ -56,6 +56,10 @@ public class Weapon : MonoBehaviour {
     void Start () {
         // Prepare the PROJECTILE_ANCHOR as parent game object, and Weapon Collar position as pos for projectiles made
         collar = GameObject.Find("Collar");
+
+        // Call SetType() properly for  the default _type
+        SetType(_type);
+
         if (PROJECTILE_ANCHOR == null)
         {
             GameObject go = new GameObject("_projectile_anchor");
@@ -140,7 +144,7 @@ public class Weapon : MonoBehaviour {
     public Projectile MakeProjectile()
     {
         GameObject projectileGo = Instantiate(def.projectilePrefab) as GameObject;
-        if (transform.gameObject.tag == "Hero")
+        if (transform.parent.gameObject.tag == "Hero")
         {
             projectileGo.tag = "ProjectileHero";
             projectileGo.layer = LayerMask.NameToLayer("ProjectileHero");

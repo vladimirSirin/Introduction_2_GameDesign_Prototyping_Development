@@ -73,5 +73,40 @@ public class Enemy : MonoBehaviour
             }
         }
     }
+
+    void OnCollisionEnter(Collision coll)
+    {
+        // Initialize the gameObject of the collision detected
+        GameObject other = coll.gameObject;
+
+
+        switch (other.tag)
+        {
+            // Check if the Enemy is just awaking or starting before
+            case "ProjectileHero":
+                Projectile proj = other.GetComponent<Projectile>();
+                Boundbox.center = transform.position + CentreoffVector3;
+                if (Boundbox.extents == Vector3.zero || Utils.ScreenBoundsCheck(Boundbox, BoundsTest.offScreen) != Vector3.zero)
+                {
+                    Destroy(other);
+                    break;
+                }
+                else
+                {
+                    //Hurt the enemy
+                    // Get the damage on hit from the W_DEFS
+                    Health -= Main.W_DEFS[proj.Type].damageOnHit;
+                    if (Health <= 0)
+                    {
+                        // Destory the enemy
+                        Destroy(this.gameObject);
+                    }
+
+                }
+                Destroy(other);
+                break;     
+        }
+
+    }
 }
 
