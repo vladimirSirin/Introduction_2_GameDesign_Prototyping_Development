@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Security.Policy;
 using UnityEngine;
 
 // This is actually outside the Utils class
@@ -235,6 +236,8 @@ public class Utils : MonoBehaviour
         return (Vector3.zero);
     }
 
+    //====================================================== Transform Functions ==================================================\\
+    
     // This function will iteratively climb up on the transfrom parent tree
     // unitl it either find a object with a tag != untagged, or there is no parent to be found
     public static GameObject FindTaggedParent(GameObject go)
@@ -255,10 +258,30 @@ public class Utils : MonoBehaviour
         return FindTaggedParent(go.transform.parent.gameObject);
     }
 
-    // The version of the function handles a transform istead of a game object
+    // The version of the function handles a transform instead of a game object
     public static GameObject FindTaggedParent(Transform t)
     {
         return FindTaggedParent(t.gameObject);
     }
 
+
+
+
+    //======================================================== Materials Functions ==================================================\\
+
+    // return a list of materials on this GameObject or its children
+    public static Material[] GetAllMaterial(GameObject go)
+    {
+        List<Material> mats = new List<Material>();
+        if (go.GetComponent<Renderer>() != null)
+        {
+            mats.Add(go.GetComponent<Renderer>().material);
+        }
+
+        foreach (Transform t in go.transform) // Every transform can have parent or child, you can loop the transform in this way
+        {
+            mats.AddRange(GetAllMaterial(t.gameObject));
+        }
+        return mats.ToArray();
+    }
 }

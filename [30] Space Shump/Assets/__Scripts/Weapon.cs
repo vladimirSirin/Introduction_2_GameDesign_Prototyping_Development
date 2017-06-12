@@ -32,7 +32,7 @@ public class WeaponDefinition
     public float damageOnHit = 0;               // Amount of damage caused
     public float continuousDamage = 0;          // Damage Per second, for lasers
     public float delayBetweenShots = 0;
-    public float velocity = 20;                 // Speed of projectiles
+    public float velocity = 20;                 // speed of projectiles
 }
 
 // Note: weapon prefabs, colors, and so on. Are set in the class 

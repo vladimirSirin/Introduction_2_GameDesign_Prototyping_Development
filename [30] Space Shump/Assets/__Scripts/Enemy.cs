@@ -6,19 +6,33 @@ public class Enemy : MonoBehaviour
 {
 
 
-    public float Speed = 10f; // the speed of the enemy in m/s
-    public float FireRate = 0.3f; // seconds/shot
-    public float Health = 10;
-    public int Score = 100;
+    public float speed = 10f; // the speed of the enemy in m/s
+    public float fireRate = 0.3f; // seconds/shot
+    public float health = 10;
+    public int score = 100;
 
     public bool _________________________________;
-    public Bounds Boundbox; // the bounds of the enemy and his children
-    public Vector3 CentreoffVector3; // the dist of bounds.centre from position
+    public Bounds boundBox; // the bounds of the enemy and his children
+    public Vector3 centreOffVector3; // the dist of bounds.centre from position
     
+
+    // for hit feedback
+    public int showDamageForFrame = 2; // # frame to show damage
+
+    public int remainingDamageFrame = 0; // Damage frames left
+    public Color[] originalColors;
+    public Material[] originalMaterials;
 
     //
     void Awake()
     {
+        originalMaterials = Utils.GetAllMaterial(gameObject);
+        originalColors = new Color[originalMaterials.Length];
+        for (int i = 0; i < originalMaterials.Length; i++)
+        {
+            originalColors[i] = originalMaterials[i].color;
+        }
+
         InvokeRepeating("CheckOffscreen", 0f, 2.0f);
     }
 
@@ -36,7 +50,7 @@ public class Enemy : MonoBehaviour
     public virtual void Move()
     {
         Vector3 tempPos = Pos;
-        tempPos.y -= Speed * Time.deltaTime;
+        tempPos.y -= speed * Time.deltaTime;
         Pos = tempPos;
     }
 
@@ -50,19 +64,19 @@ public class Enemy : MonoBehaviour
     public void CheckOffscreen()
     {
         // Check if the Bounds params are zero
-        if (Boundbox.size == Vector3.zero)
+        if (boundBox.size == Vector3.zero)
         {
-            // If so, initialize the Boundbox with the utils functions
-            Boundbox = Utils.CombineBoundsOfChildren(this.gameObject);
-            // Calculate the offset of the position and Boundbox centre
-            CentreoffVector3 = Boundbox.center - this.transform.position;
+            // If so, initialize the boundBox with the utils functions
+            boundBox = Utils.CombineBoundsOfChildren(this.gameObject);
+            // Calculate the offset of the position and boundBox centre
+            centreOffVector3 = boundBox.center - this.transform.position;
         }
 
         // Caliberate the offset
-        Boundbox.center = CentreoffVector3 + this.transform.position;
+        boundBox.center = centreOffVector3 + this.transform.position;
 
         // Check if this is off screen
-        Vector3 off = Utils.ScreenBoundsCheck(Boundbox, BoundsTest.offScreen);
+        Vector3 off = Utils.ScreenBoundsCheck(boundBox, BoundsTest.offScreen);
 
         // if so, destroy it.
         if (off != Vector3.zero)
@@ -85,8 +99,8 @@ public class Enemy : MonoBehaviour
             // Check if the Enemy is just awaking or starting before
             case "ProjectileHero":
                 Projectile proj = other.GetComponent<Projectile>();
-                Boundbox.center = transform.position + CentreoffVector3;
-                if (Boundbox.extents == Vector3.zero || Utils.ScreenBoundsCheck(Boundbox, BoundsTest.offScreen) != Vector3.zero)
+                boundBox.center = transform.position + centreOffVector3;
+                if (boundBox.extents == Vector3.zero || Utils.ScreenBoundsCheck(boundBox, BoundsTest.offScreen) != Vector3.zero)
                 {
                     Destroy(other);
                     break;
@@ -95,8 +109,8 @@ public class Enemy : MonoBehaviour
                 {
                     //Hurt the enemy
                     // Get the damage on hit from the W_DEFS
-                    Health -= Main.W_DEFS[proj.Type].damageOnHit;
-                    if (Health <= 0)
+                    health -= Main.W_DEFS[proj.Type].damageOnHit;
+                    if (health <= 0)
                     {
                         // Destory the enemy
                         Destroy(this.gameObject);
