@@ -44,6 +44,14 @@ public class Enemy : MonoBehaviour
 	// Update is called once per frame
 	void Update () {
 		Move();
+	    if (remainingDamageFrame > 0)
+	    {
+	        remainingDamageFrame--;
+	        if (remainingDamageFrame == 0)
+	        {
+	            UnShowDamage();
+	        }
+	    }
 	}
 
 
@@ -108,6 +116,7 @@ public class Enemy : MonoBehaviour
                 else
                 {
                     //Hurt the enemy
+                    ShowDamage();
                     // Get the damage on hit from the W_DEFS
                     health -= Main.W_DEFS[proj.Type].damageOnHit;
                     if (health <= 0)
@@ -121,6 +130,23 @@ public class Enemy : MonoBehaviour
                 break;     
         }
 
+    }
+
+    void ShowDamage()
+    {
+        foreach (Material m in originalMaterials)
+        {
+            m.color = Color.red;
+        }
+        remainingDamageFrame = showDamageForFrame;
+    }
+
+    void UnShowDamage()
+    {
+        for (int i = 0; i < originalMaterials.Length; i++)
+        {
+            originalMaterials[i].color = originalColors[i];
+        }
     }
 }
 
