@@ -27,6 +27,8 @@ public class Hero : MonoBehaviour
     // Create a WeaponFireDelegate instance of the delegate for hero to call/fire
     public WeaponFireDelegate FireDelegate;
     
+    // Weapon Fields
+    public Weapon[] weapons;
 
     // Properties
     public float ShieldLevel
@@ -48,6 +50,10 @@ public class Hero : MonoBehaviour
     {
         S = this; // Set the Singleton
         Bounds = Utils.CombineBoundsOfChildren(this.gameObject);
+
+        // Reset the weapon to default
+        ClearWeapons();
+        weapons[0].Type = WeaponType.blaster;
     }
 
 	// Use this for initialization
@@ -109,11 +115,17 @@ public class Hero : MonoBehaviour
             }
             _lastTriggerGameObject = parent;
 
-            // If it is the enemy. Decrease the sheild level of the hero and destroy the enemy
+            // If it is the enemy. Decrease the shield level of the hero and destroy the enemy
             if (parent.tag == "Enemy")
             {
                 this.ShieldLevel--;
                 Destroy(parent);
+            }
+
+            // If it is a power up
+            else if (parent.tag == "PowerUp")
+            {
+                AbsorbPowerUp(parent);
             }
             else
             {
@@ -125,6 +137,60 @@ public class Hero : MonoBehaviour
         else
         {
             print("Triggered" + other.gameObject.name);
+        }
+    }
+
+    // absorb power up function
+    public void AbsorbPowerUp(GameObject go)
+    {
+        PowerUp pu = go.GetComponent<PowerUp>();
+        switch (pu.type)
+        {
+            case WeaponType.shield:
+                ShieldLevel++;
+                break;
+            default:
+                // Check if the power up type is same as he current one
+                if (weapons[0].Type == pu.type)
+                {
+                    // Then increase the number of weapons of this type
+                    Weapon w = GetEmptyWeaponSlot(); // find an available weapon
+                    if (w != null)
+                    {
+                        w.Type = pu.type; // set the type to pu.type
+                    }
+                }
+                else
+                {
+                    // If it is a different type of weapon
+                    ClearWeapons(); // clear the weapons array
+                    weapons[0].Type = pu.type; // set the initial one as the new type
+                }
+                break;
+                
+        }
+    }
+
+    // Get empty weapon slot
+    public Weapon GetEmptyWeaponSlot()
+    {
+        for (int i = 0; i < weapons.Length; i++)
+        {
+            if (weapons[i].Type != WeaponType.none)
+            {
+                return weapons[i];
+            }
+        }
+
+        return null;
+    }
+
+    // Clear Weapons
+    void ClearWeapons()
+    {
+        foreach (var w in weapons)
+        {
+            w.Type = WeaponType.none;
         }
     }
 }
