@@ -42,7 +42,7 @@ public class Weapon : MonoBehaviour {
 
     // Initialize the variables for weapon fire delegate
     public static Transform PROJECTILE_ANCHOR;
-
+    
     [SerializeField]
     private WeaponType _type = WeaponType.blaster;
 
@@ -51,11 +51,17 @@ public class Weapon : MonoBehaviour {
     public float lastShot; // Time last shot was fired
 
 
+    void Awake()
+    {
+        // Prepare the PROJECTILE_ANCHOR as parent game object, and Weapon Collar position as pos for projectiles made
+        collar = transform.Find("Collar").gameObject;
+    }
+
+
 
     // Use this for initialization
     void Start () {
-        // Prepare the PROJECTILE_ANCHOR as parent game object, and Weapon Collar position as pos for projectiles made
-        collar = GameObject.Find("Collar");
+
 
         // Call SetType() properly for  the default _type
         SetType(_type);
@@ -143,7 +149,7 @@ public class Weapon : MonoBehaviour {
     // Define the MakeProjectile function, which is used in Fire function to instantiate the prefabs and return to Fire
     public Projectile MakeProjectile()
     {
-        GameObject projectileGo = Instantiate(def.projectilePrefab) as GameObject;
+        GameObject projectileGo = Instantiate(def.projectilePrefab);
         if (transform.parent.gameObject.tag == "Hero")
         {
             projectileGo.tag = "ProjectileHero";

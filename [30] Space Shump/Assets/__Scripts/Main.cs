@@ -15,10 +15,12 @@ public class Main : MonoBehaviour
     public float EnemySpawnPadding = 1.5f;
     public WeaponDefinition[] WeaponDefinitions;
     public WeaponType[] activeWeaponTypes;
+    public GameObject prefabPowerUp;
+    public WeaponType[] powerUpFrequency = {WeaponType.blaster, WeaponType.blaster, WeaponType.spread, WeaponType.shield, };
 
     public bool _____________________________________;
 
-    public float EnemySpawnRate; // Time between two enemy spawns
+    public float enemySpawnRate; // Time between two enemy spawns
 
     // Awake
     void Awake()
@@ -26,14 +28,14 @@ public class Main : MonoBehaviour
         S = this;
 
         // Initiliaze the camera bounds
-        Utils.SetCameraBounds(this.GetComponent<Camera>());
+        Utils.SetCameraBounds(GetComponent<Camera>());
 
         // Calculate the enemy spawn rate
-        EnemySpawnRate = 1.0f / EnemySpawnPerSecond;
+        enemySpawnRate = 1.0f / EnemySpawnPerSecond;
 
 
         // Invoke the spawn Enemy function to spawn
-        Invoke("SpawnEnemy", EnemySpawnRate);
+        Invoke("SpawnEnemy", enemySpawnRate);
 
         // Initialize the dictionary of weapon definitions
         W_DEFS = new Dictionary<WeaponType, WeaponDefinition>();
@@ -78,7 +80,7 @@ public class Main : MonoBehaviour
         go.transform.position = posVector3;
 
         // Invoke another spawn
-        Invoke("SpawnEnemy", EnemySpawnRate);
+        Invoke("SpawnEnemy", enemySpawnRate);
 
     }
 
@@ -110,4 +112,24 @@ public class Main : MonoBehaviour
         // Which means it has failed to find the weapon definition
         return new WeaponDefinition();
     }
+
+    public void ShipDestroyed(Enemy e)
+    {
+        // Potentially generate a power up
+        float chance = Random.value;
+        if (chance <= e.powerUpDropChance)
+            // Random.value generates a value between 0 and 1 (though never ==1)
+            // If the e.powerUpDropChance is 0.50f, a PowerUp will be generated 50% of the time. For testing , it's now set to 1f
+        {
+            // Spawn the gameobject
+            GameObject go = Instantiate(prefabPowerUp);
+
+            // Choose the type of power up
+            go.GetComponent<PowerUp>().SetType(powerUpFrequency[Random.Range(0, powerUpFrequency.Length)]);
+
+            // Set it to the position of the destroyed ship
+            go.GetComponent<PowerUp>().transform.position = e.transform.position;
+        }
+    }
 }
+

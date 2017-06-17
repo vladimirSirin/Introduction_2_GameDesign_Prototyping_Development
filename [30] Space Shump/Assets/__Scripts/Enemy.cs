@@ -23,7 +23,9 @@ public class Enemy : MonoBehaviour
     public Color[] originalColors;
     public Material[] originalMaterials;
 
-    //
+    // Drop Powerup chance
+    public float powerUpDropChance = 1f;
+
     void Awake()
     {
         originalMaterials = Utils.GetAllMaterial(gameObject);
@@ -111,6 +113,7 @@ public class Enemy : MonoBehaviour
                 if (boundBox.extents == Vector3.zero || Utils.ScreenBoundsCheck(boundBox, BoundsTest.offScreen) != Vector3.zero)
                 {
                     Destroy(other);
+
                     break;
                 }
                 else
@@ -122,6 +125,7 @@ public class Enemy : MonoBehaviour
                     if (health <= 0)
                     {
                         // Destory the enemy
+                        Main.S.ShipDestroyed(this);
                         Destroy(this.gameObject);
                     }
 

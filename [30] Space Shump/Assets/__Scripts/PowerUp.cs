@@ -92,7 +92,7 @@ public class PowerUp : MonoBehaviour {
         // Grab the weapon definition from Main
         WeaponDefinition def = Main.GetWeaponDefinition(wt);
         // Sets the color of the Cube child
-        cube.GetComponent<Material>().color = def.color;
+        cube.GetComponent<Renderer>().material.color = def.color;
         // We could colorize the letter too
         letter.text = def.letter;
         // Finally actually set the type

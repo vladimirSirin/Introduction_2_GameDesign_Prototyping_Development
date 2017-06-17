@@ -51,15 +51,15 @@ public class Hero : MonoBehaviour
         S = this; // Set the Singleton
         Bounds = Utils.CombineBoundsOfChildren(this.gameObject);
 
-        // Reset the weapon to default
-        ClearWeapons();
-        weapons[0].Type = WeaponType.blaster;
+
     }
 
 	// Use this for initialization
 	void Start () {
-		
-	}
+	    // Reset the weapon to default
+	    ClearWeapons();
+	    weapons[0].Type = WeaponType.blaster;
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -149,6 +149,7 @@ public class Hero : MonoBehaviour
             case WeaponType.shield:
                 ShieldLevel++;
                 break;
+
             default:
                 // Check if the power up type is same as he current one
                 if (weapons[0].Type == pu.type)
@@ -169,14 +170,15 @@ public class Hero : MonoBehaviour
                 break;
                 
         }
+        pu.AbsorbedBy(this.gameObject);
     }
 
     // Get empty weapon slot
-    public Weapon GetEmptyWeaponSlot()
+    Weapon GetEmptyWeaponSlot()
     {
         for (int i = 0; i < weapons.Length; i++)
         {
-            if (weapons[i].Type != WeaponType.none)
+            if (weapons[i].Type == WeaponType.none)
             {
                 return weapons[i];
             }
