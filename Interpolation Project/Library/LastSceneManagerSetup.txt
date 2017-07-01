@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/_Scene_02.unity
+- path: Assets/_BezierScene.unity
   isLoaded: 1
   isActive: 1
