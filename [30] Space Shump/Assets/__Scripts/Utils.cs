@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Policy;
+using UnityEditor;
 using UnityEngine;
 
 // This is actually outside the Utils class
@@ -284,4 +286,53 @@ public class Utils : MonoBehaviour
         }
         return mats.ToArray();
     }
+
+
+
+    //======================================================= Recursive Bezier Curve Function ==============================================\\
+
+    // The Standard Vector Lerp functions in Unity don't allow for extrapolation
+    // (i.e., u is clamped to 0 <= u <= 1) so we write our own Lerp function
+    public static Vector3 Lerp(Vector3 vFrom, Vector3 vTo, float u)
+    {
+        Vector3 resVector3 = (1 - u) * vFrom + u * vTo;
+        return resVector3;
+    }
+
+
+
+    // While most Bezier curves are 3 or 4 points, it is possible to have any number of points using this recursive function
+    // This uses the Lerp function above because the Vector3.lerp function doesn't allow extrapolation
+    public static Vector3 Bezier(float u, List<Vector3> vList)
+    {
+        // If there is only one element in vList, return it
+        if (vList.Count == 1)
+        {
+            return vList[0];
+        }
+
+        // If there are more than one element, separate them into two lists
+        // Put all the elements except the rightest one into one list for calculation
+        List<Vector3> vListLeft = vList.GetRange(0, vList.Count - 1);
+
+        // Put all the elements except the leftest one into one list for calculation
+        List<Vector3> vListRight = vList.GetRange(1, vList.Count - 1);
+
+
+        // Do the Bezier function with both of the list, and use the lerp function 
+        // The result is the Lerp of the Bezier of these two shorter lists
+        Vector3 res = Lerp(Bezier(u, vListLeft), Bezier(u, vListRight), u);
+
+        // ^ The Bezier function recursively calls itself here to split the lists down unitl there is only one value in each
+
+        return res; // return the result
+    }
+
+    // This version allows an array or a series of Vector3s as inPut which is then converted into a List<Vector3>
+    public static Vector3 Bezier(float u, params Vector3[] vArray)
+    {
+        List<Vector3> vList = new List<Vector3>(vArray);
+        return Bezier(u, vList);
+    }
+    
 }
