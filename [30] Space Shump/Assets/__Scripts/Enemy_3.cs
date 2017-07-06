@@ -44,7 +44,7 @@ public class Enemy_3 : Enemy {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	public override void Move() {
 
         // Calculate the float u with the time elapsed
 	    float u = (Time.time - birthTime) / lifeTime;
