@@ -13,7 +13,7 @@ public class Enemy : MonoBehaviour
 
     public bool _________________________________;
     public Bounds boundBox; // the bounds of the enemy and his children
-    public Vector3 centreOffVector3; // the dist of bounds.centre from position
+    public Vector3 boundsCentreOffVector3; // the dist of bounds.centre from position
     
 
     // for hit feedback
@@ -79,11 +79,11 @@ public class Enemy : MonoBehaviour
             // If so, initialize the boundBox with the utils functions
             boundBox = Utils.CombineBoundsOfChildren(this.gameObject);
             // Calculate the offset of the position and boundBox centre
-            centreOffVector3 = boundBox.center - this.transform.position;
+            boundsCentreOffVector3 = boundBox.center - this.transform.position;
         }
 
         // Caliberate the offset
-        boundBox.center = centreOffVector3 + this.transform.position;
+        boundBox.center = boundsCentreOffVector3 + this.transform.position;
 
         // Check if this is off screen
         Vector3 off = Utils.ScreenBoundsCheck(boundBox, BoundsTest.offScreen);
@@ -109,7 +109,7 @@ public class Enemy : MonoBehaviour
             // Check if the Enemy is just awaking or starting before
             case "ProjectileHero":
                 Projectile proj = other.GetComponent<Projectile>();
-                boundBox.center = transform.position + centreOffVector3;
+                boundBox.center = transform.position + boundsCentreOffVector3;
                 if (boundBox.extents == Vector3.zero || Utils.ScreenBoundsCheck(boundBox, BoundsTest.offScreen) != Vector3.zero)
                 {
                     Destroy(other);
