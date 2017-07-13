@@ -8,6 +8,8 @@ public class Deck : MonoBehaviour
     public bool _______________________________;
 
     public PT_XMLReader xmlr;
+    public List<string> cardName;
+    public List<Card> cards;
     
 	// Use this for initialization
 	void Start () {
@@ -43,6 +45,31 @@ public class Deck : MonoBehaviour
         s += " x=" + xmlr.xml["xml"][0]["decorator"][0].att("x");
         s += " y=" + xmlr.xml["xml"][0]["decorator"][0].att("y");
         s += " scale=" + xmlr.xml["xml"][0]["decorator"][0].att("scale");
-        print(s);
+        //print(s); // Comment out this line, since we are done with the test
+
+
+
+        // Read decorators for all Cards
+        // Init the list of decorators
+
+        // Grab a PT_XMLHashList of all <decorator>s in the XML file
+
+
+
+
+        // Read pip location for each card number
+        // Init the List of the Cards
+
+        // Grab a PT_XMLHashList of all the <card>s in the XML file
+
+
+
+        // Face cards (Jack, Queen, & King) have a face attribute
+        // cDef.face is the best name of the face Sprite
+        // e.g., FaceCard_11 is the base name for the Jack face Sprites
+        // the Jack of Clubs is FaceCard_11C, hearts is FaceCard_11H, etc.
+
+
+
     }
 }

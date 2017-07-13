@@ -19,7 +19,7 @@ xml["jeremy"][0].att("age");
 */
 		
 
-
+// Define the class of XMLReader
 [System.Serializable]
 public class PT_XMLReader {
 	static public bool		SHOW_COMMENTS = false;
@@ -186,11 +186,12 @@ public class PT_XMLReader {
 }
 
 
-
+// Define the class of HashList, the List of Hashtables
 public class PT_XMLHashList {
-	public ArrayList list = new ArrayList();
-	
-	public PT_XMLHashtable this[int s] {
+	public ArrayList list = new ArrayList(); // Can be array, since arraylist is deprecated 
+
+    // Define a property of the indexed elements of the list - Hashtables
+    public PT_XMLHashtable this[int s] {
 		get {
 			return(list[s] as PT_XMLHashtable);
 		}
@@ -217,19 +218,26 @@ public class PT_XMLHashList {
 }
 
 
+
+
+// Define the class of Hashtable
 public class PT_XMLHashtable {
 	
-	public List<string>				keys = new List<string>();
-	public List<PT_XMLHashList>		nodesList = new List<PT_XMLHashList>();
-	public List<string>				attKeys = new List<string>();
-	public List<string>				attributesList = new List<string>();
+	public List<string>				keys = new List<string>(); // Define the keys of the Hashtable
+	public List<PT_XMLHashList>		nodesList = new List<PT_XMLHashList>(); // Define the List this table is belong to ?
+	public List<string>				attKeys = new List<string>(); // Define the attribution keys it has
+	public List<string>				attributesList = new List<string>(); // Define the actual attributes list
 	
+
+    // Based on the key to Get the corresponding Hashtable
 	public PT_XMLHashList Get(string key) {
-		int ndx = Index(key);
-		if (ndx == -1) return(null);
-		return( nodesList[ndx] );
+		int ndx = Index(key); // Get the index of the string, if cannot found, return -1
+		if (ndx == -1) return(null); // Return null if there is no such key
+		return( nodesList[ndx] ); // Otherwise, return the Hashtable as List[x]
 	}
 	
+
+
 	public void Set(string key, PT_XMLHashList val) {
 		int ndx = Index(key);
 		if (ndx != -1) {
