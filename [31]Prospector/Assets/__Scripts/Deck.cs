@@ -10,6 +10,7 @@ public class Deck : MonoBehaviour
     public PT_XMLReader xmlr;
     public List<string> cardName;
     public List<Card> cards;
+    public List<Decorator> decorators;
     
 	// Use this for initialization
 	void Start () {
@@ -51,9 +52,11 @@ public class Deck : MonoBehaviour
 
         // Read decorators for all Cards
         // Init the list of decorators
-
+        decorators = new List<Decorator>();
         // Grab a PT_XMLHashList of all <decorator>s in the XML file
+        PT_XMLHashList decoHashList = xmlr.xml["xml"][0]["decorator"];
 
+        // Initialize the decorators in the xml and add them into the decorators list.
 
 
 

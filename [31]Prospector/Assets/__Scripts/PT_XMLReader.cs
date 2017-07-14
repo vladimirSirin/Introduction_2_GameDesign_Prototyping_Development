@@ -191,6 +191,7 @@ public class PT_XMLHashList {
 	public ArrayList list = new ArrayList(); // Can be array, since arraylist is deprecated 
 
     // Define a property of the indexed elements of the list - Hashtables
+    // So we have hashtables in the fucking hashlist, and vice versa
     public PT_XMLHashtable this[int s] {
 		get {
 			return(list[s] as PT_XMLHashtable);
@@ -200,6 +201,8 @@ public class PT_XMLHashList {
 		}
 	}
 	
+
+    // Add, Count and check the length of the HashList
 	public void Add(PT_XMLHashtable eH) {
 		list.Add(eH);
 	}
@@ -237,41 +240,58 @@ public class PT_XMLHashtable {
 	}
 	
 
-
+    // Set the hashtable value of a certain key, the value is a hashlist
 	public void Set(string key, PT_XMLHashList val) {
-		int ndx = Index(key);
+		int ndx = Index(key); 
 		if (ndx != -1) {
-			nodesList[ndx] = val;
+			nodesList[ndx] = val; // If there is an index as the key, set the value of the nodesList[idx] as the value
 		} else {
-			keys.Add(key);
-			nodesList.Add(val);
+			keys.Add(key); // If there is no such index, add this key as the index
+			nodesList.Add(val); // And add this value into the List. since it is the last value and the last key, 
+                                //so there are corresponded with each other too.
 		}
 	}
 	
+
+    // Find the index of string key in the list - keys,
+    // Since the fact here is using a key string list and a value hashlist list
+    // Corresponding to each other.
 	public int Index(string key) {
 		return(keys.IndexOf(key));
 	}
 	
+
+
+    // In the same way, attKeys serve as a list of keys in this hashtable class
+    // The attributesList serve as the value
 	public int AttIndex(string attKey) {
 		return(attKeys.IndexOf(attKey));
 	}
 	
 	
+
+    // Define the property of the elements of the Hashtable
 	public PT_XMLHashList this[string s] {
 		get {
-			return( Get(s) );
+			return( Get(s) ); // Call the Get function to get the value from the nodesList
 		}
 		set {
-			Set( s, value );
+			Set( s, value ); // Call the Set function to set the value
 		}
 	}
 	
+
+
+    // Using the same way, find the index of attKey in the list of keys and return the attributesList[x]
 	public string att(string attKey) {
 		int ndx = AttIndex(attKey);
 		if (ndx == -1) return("");
 		return( attributesList[ndx] );
 	}
 	
+
+
+    // Using the same trick to set the value of the attributeList[x]
 	public void attSet(string attKey, string val) {
 		int ndx = AttIndex(attKey);
 		if (ndx == -1) {
@@ -282,6 +302,9 @@ public class PT_XMLHashtable {
 		}
 	}
 	
+
+
+    // Define the text description property
 	public string text {
 		get {
 			int ndx = AttIndex("@");
@@ -299,7 +322,7 @@ public class PT_XMLHashtable {
 		}
 	}
 	
-	
+	// Define the header property
 	public string header {
 		get {
 			int ndx = AttIndex("@XML_Header");
@@ -317,7 +340,7 @@ public class PT_XMLHashtable {
 		}
 	}
 	
-	
+	// The nodes property, showing all the keys of the hashtable
 	public string nodes {
 		get {
 			string s = "";
@@ -328,6 +351,9 @@ public class PT_XMLHashtable {
 		}
 	}
 	
+
+
+    // The attributes property, showing all the attributes
 	public string attributes {
 		get {
 			string s = "";
