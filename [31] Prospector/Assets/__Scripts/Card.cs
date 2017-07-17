@@ -2,8 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Card : MonoBehaviour {
-    // This will be define later
+public class Card : MonoBehaviour
+{
+
+    public string suit; // the suit of the card
+    public int rank; // the rank of the card
+    public Color color = Color.black; // the color of the card pips(symbols)
+    public string colS = "Black"; // the name of the color
+
+    // This list holds all of the Decorator GameObjects
+    public List<GameObject> decoGos = new List<GameObject>();
+    // This List holds all of the Pip GameObjects
+    public List<GameObject> pipGos = new List<GameObject>();
+
+    public GameObject back; // The GameObject of the back of the card
+    public CardDefinition def; // the card definition parsed from DeckXML.xml
+
 
 	// Use this for initialization
 	void Start () {
@@ -17,7 +31,7 @@ public class Card : MonoBehaviour {
 }
 
 
-
+[System.Serializable]
 public class Decorator
 {
     // This class stores information about each decorator or pip from DeckXML
@@ -32,7 +46,7 @@ public class Decorator
 }
 
 
-
+[System.Serializable]
 public class CardDefinition
 {
     // This class stores information for each rank of card
