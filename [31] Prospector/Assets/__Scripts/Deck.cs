@@ -232,7 +232,6 @@ public class Deck : MonoBehaviour
         cards = new List<Card>();
 
         // Several variables that will be used several  times
-        Sprite tS = null;
         GameObject tGO = null;
         SpriteRenderer tSR = null;
 
@@ -293,7 +292,7 @@ public class Deck : MonoBehaviour
                 tSR.sortingOrder = 1;
 
                 // Make the decorator sprites at a correct position
-                tGO.transform.parent = cardGO.transform;
+                tGO.transform.parent = card.transform;
                 tGO.transform.localPosition = deco.loc;
 
                 // Make the decorator sprites at a correct size and is flip
@@ -309,11 +308,90 @@ public class Deck : MonoBehaviour
                 card.decoGos.Add(tGO);
             }
 
+            // Add the pips in a correct way
+            // For each of the pips in the definition
+            // Same way as the decorators, only without suit/letter identify
+            foreach (Decorator pip in card.def.pips)
+            {
+                tGO = Instantiate(prefabSprite);
+                tSR = tGO.GetComponent<SpriteRenderer>();
+                tSR.sprite = dictSuits[card.suit];
 
+                tSR.color = card.color;
+                tSR.sortingOrder = 1;
+
+                tGO.transform.parent = card.transform;
+                tGO.transform.localPosition = pip.loc;
+
+                if (pip.flip)
+                {
+                    tGO.transform.localRotation = Quaternion.Euler(0, 0, 180);
+                }
+
+                if (pip.scale != 1)
+                {
+                    tGO.transform.localScale = pip.scale * Vector3.one;
+                }
+
+                card.pipGos.Add(tGO);
+            }
+
+            // Handle Face Cards
+            if (card.def.face != "")
+            {
+                // if this card has a face in the card definition
+                // instantiate the gameobject and render this as a face card
+                tGO = Instantiate(prefabSprite);
+                tSR = tGO.GetComponent<SpriteRenderer>();
+
+                // Genrate the right name for Get face
+                tSR.sprite = GetFace(card.def.face + card.suit);
+
+                tSR.sortingOrder = 1;
+
+                tGO.transform.parent = card.transform;
+                tGO.transform.localPosition = Vector3.zero;
+                tGO.name = "face";
+
+            }
+
+            // Handle the card back
+            // The card_back will be able to cover everything else on the card
+            tGO = Instantiate(prefabSprite);
+            tSR = tGO.GetComponent<SpriteRenderer>();
+            tSR.sprite = cardBack;
+
+            tGO.transform.parent = card.transform;
+            tGO.transform.localPosition = Vector3.zero;
+
+            // This is a higher sortingOrder than anything else
+            tSR.sortingOrder = 2;
+            tGO.name = "back";
+            card.back = tGO;
+
+            // Default to face-up
+            card.faceUp = false; // use the property faceUp of card
+
+            
 
             // Add them into the list       
             cards.Add(card);
         }
 
+    } // This is the closing brace for MakeCards()
+
+    // the get face function
+    // given a name of the face and find the correct face sprite
+    public Sprite GetFace(string faceName)
+    {
+        foreach (Sprite faceSprite in faceSprites)
+        {
+            if (faceSprite.name == faceName)
+            {
+                return faceSprite;
+            }
+        }
+
+        return null;
     }
 }

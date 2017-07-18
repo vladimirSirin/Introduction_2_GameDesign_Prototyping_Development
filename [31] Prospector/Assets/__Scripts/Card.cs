@@ -18,6 +18,12 @@ public class Card : MonoBehaviour
     public GameObject back; // The GameObject of the back of the card
     public CardDefinition def; // the card definition parsed from DeckXML.xml
 
+    // Adding the faceUp property
+    public bool faceUp
+    {
+        get { return (!back.activeSelf); }
+        set { back.SetActive(!value); }
+    }
 
 	// Use this for initialization
 	void Start () {
