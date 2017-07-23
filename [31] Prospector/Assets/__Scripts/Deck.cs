@@ -370,7 +370,7 @@ public class Deck : MonoBehaviour
             card.back = tGO;
 
             // Default to face-up
-            card.faceUp = false; // use the property faceUp of card
+            card.faceUp = true; // use the property faceUp of card
 
             
 
@@ -393,5 +393,35 @@ public class Deck : MonoBehaviour
         }
 
         return null;
+    }
+
+
+    // function to shuffle the cards
+    public static void ShuffleDeck(ref List<Card> oCards)
+    {
+        // Create a temp list of cards to hold the list info.
+        List<Card> tCards = new List<Card>();
+
+        int ndx; // This will hold the index of the card to be moved
+        tCards = new List<Card>(); // Initialize the temporary List
+        
+        // Repeat as long as there are cards in the original list
+        while (oCards.Count > 0)
+        {
+            // Pick the index of a random card
+            ndx = Random.Range(0, oCards.Count);
+
+            // Add the card to the temp list
+            tCards.Add(oCards[ndx]);
+
+            // Add remove the card from the original list
+            oCards.RemoveAt(ndx);
+        }
+
+        // Replace the original list with the temp list
+        oCards = tCards;
+
+        // Because oCards is a reference variable, the original that was
+        // passed in is changed as well.
     }
 }

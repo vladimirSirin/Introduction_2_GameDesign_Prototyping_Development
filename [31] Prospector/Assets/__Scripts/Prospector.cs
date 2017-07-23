@@ -23,6 +23,10 @@ public class Prospector : MonoBehaviour
 
 	    deck = GetComponent<Deck>(); // Get the Deck
         deck.InitDeck(deckXML.text); // Pass DeckXML to it
+        Deck.ShuffleDeck(ref deck.cards); // This shuffle the deck
+
+        // The ref keyword passes a reference to deck.cards, which allows
+        // deck.cards to be modified by shuffle function
 
 	}
 	
