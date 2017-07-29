@@ -111,9 +111,35 @@ public class Prospector : MonoBehaviour
             cp.state = CardState.tableau; // CardProspectors in the tableau have the state CardState.tableau
             cp.layoutId = slotDef.layerId;
             cp.slotDef = slotDef;
+
+            cp.SetSortingLayerName(slotDef.layerName); // Set the sorting layers
             
             tableau.Add(cp); // Add this CarProspector to the List<> tableau
 
+        }
+    }
+
+    // the CardClicked function
+    public void CardClicked(CardProspector card)
+    {
+        switch (card.state)
+        {
+            case CardState.target:
+                // Click the target card does nothing
+                break;
+            
+            case CardState.drawpile:
+                // Click the drawpile will replace the target card with a new one and move it to discardPile
+                MoveToDiscard(card);
+
+                MoveToTarget(Draw());
+
+                UpdateDrawPile();
+                break;
+
+            case CardState.tableau:
+                // Click a card in the tableau will check if it's a valid play
+                break;
         }
     }
 }
