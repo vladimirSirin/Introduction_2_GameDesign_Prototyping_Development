@@ -78,6 +78,23 @@ public class Prospector : MonoBehaviour
         return cd;  // And return it
     }
 
+    // Convert the layoutId into the CardProspector in this slot
+    CardProspector FindCardByLayoutID(int layoutID)
+    {
+        foreach (CardProspector cd in tableau)
+        {
+            // search through all cards in the tableau list<>
+            if (cd.layoutId == layoutID)
+            {
+                // If the card has the same ID, return it
+                return cd;
+            }
+        }
+
+        // If it is not found, return null
+        return null;
+    }
+
     // LayoutGame() Position the initial tableau of cards, aka the "mine"
     void LayoutGame()
     {
@@ -109,7 +126,7 @@ public class Prospector : MonoBehaviour
             // ^Set the localPosition of the card based on slotDef
 
             cp.state = CardState.tableau; // CardProspectors in the tableau have the state CardState.tableau
-            cp.layoutId = slotDef.layerId;
+            cp.layoutId = slotDef.id;
             cp.slotDef = slotDef;
 
             cp.SetSortingLayerName(slotDef.layerName); // Set the sorting layers
@@ -117,6 +134,22 @@ public class Prospector : MonoBehaviour
             tableau.Add(cp); // Add this CarProspector to the List<> tableau
 
         }
+
+        // Iterate through the hiddenby list of the slotDef and find the cards
+        foreach (CardProspector cd in tableau)
+        {
+            foreach (int id in cd.slotDef.hiddenBy)
+            {
+                cp = FindCardByLayoutID(id);
+                cd.hiddenBy.Add(cp);
+            }
+        }
+
+
+        // Set up the initial tableau
+        MoveToTarget(Draw());
+        UpdateDrawPile();
+
     }
 
     // the CardClicked function
@@ -130,7 +163,7 @@ public class Prospector : MonoBehaviour
             
             case CardState.drawpile:
                 // Click the drawpile will replace the target card with a new one and move it to discardPile
-                MoveToDiscard(card);
+                MoveToDiscard(target);
 
                 MoveToTarget(Draw());
 
@@ -139,7 +172,141 @@ public class Prospector : MonoBehaviour
 
             case CardState.tableau:
                 // Click a card in the tableau will check if it's a valid play
+                bool validPlay = card.faceUp; // Check if it is hidden ( faceUp or not)
+
+                // Check if it is adjacent to the target
+                if (!AdjacentRank(card, target))
+                {
+                    validPlay = false;
+                }
+
+                if (validPlay == false) return; // Return if it is not a valid move
+
+                // It is a valid move
+                MoveToDiscard(target); // remove the origin target
+                tableau.Remove(card); // Remove it from the tableau list
+                MoveToTarget(card); // Make it the new target
+                SetTableauFaces(); // Update tableau card face-
+                
+
                 break;
         }
+    }
+
+    // Moves the current target to the discardPile
+    void MoveToDiscard(CardProspector cd)
+    {
+        // Set the card state to discard
+        cd.state = CardState.discard;
+
+        // Set the parent and localposition to the discardpile
+        cd.transform.parent = layoutAnchor;
+        float x = layout.multiplier.x * layout.discardPile.x;
+        float y = layout.multiplier.y * layout.discardPile.y;
+
+        cd.transform.localPosition = new Vector3(x, y, -layout.discardPile.layerId + 0.5f);
+
+        // Set the faceUp
+        cd.faceUp = true;
+
+        // Add it to the list of discardPile
+        discardPile.Add(cd);
+
+        // Place it on top of the pile for depth sorting
+        cd.SetSortingLayerName(layout.discardPile.layerName);
+        cd.SetSortingOrder(-100+discardPile.Count);
+    }
+
+    // Move the top card of the DrawPile to the target
+    void MoveToTarget(CardProspector cd)
+    {
+        // Set the card state to target
+        cd.state = CardState.target;
+
+        // Set the parent and localpotion to the target position
+        cd.transform.parent = layoutAnchor;
+        cd.transform.localPosition = new Vector3(
+            layout.multiplier.x * layout.discardPile.x,
+            layout.multiplier.y * layout.discardPile.y,
+            -layout.discardPile.layerId);
+
+        // Set the faceUp
+        cd.faceUp = true;
+
+        // Set it to target
+        target = cd;
+
+        // Place it on the target layer and set the order
+        cd.SetSortingLayerName(layout.discardPile.layerName);
+        cd.SetSortingOrder(0);
+    }
+
+    // Arrange all the cards of the drawPile to show how many are left
+    void UpdateDrawPile()
+    {
+        // go through all the left cards in the drawPile
+        for (int i = 0; i < drawPile.Count; i++)
+        {
+            // Set the position
+            CardProspector cd = drawPile[i];
+            cd.transform.parent = layoutAnchor;
+            cd.transform.localPosition = new Vector3(
+                layout.multiplier.x * (layout.drawPile.x + i*layout.drawPile.stagger.x),
+                layout.multiplier.y * (layout.drawPile.y + i*layout.drawPile.stagger.y),
+                -layout.drawPile.layerId + i * 0.1f);
+
+            // Set the face down
+            cd.faceUp = false;
+
+            // Set the state as drawpile
+            cd.state = CardState.drawpile;
+            
+            // Sorting the order and layers
+            cd.SetSortingLayerName(layout.drawPile.layerName);
+            cd.SetSortingOrder(-10*i);
+        }
+    }
+
+    // Check whether two cards are adjacent to each other by value (Handles A-to-King wrapround)
+    public bool AdjacentRank(CardProspector c0, CardProspector c1)
+    {
+        // If either card is face down, it's not adjacent
+        if (!c0.faceUp || !c1.faceUp) return false;
+
+        // If they are 1 apart, they are adjacent
+        if (Mathf.Abs(c0.rank - c1.rank) == 1)
+        {
+            return true;
+        }
+
+        // If one is A and the other is King, they are adjacent
+        if (c0.rank == 13 && c1.rank == 1) return true;
+        if (c0.rank == 1 && c1.rank == 13) return true;
+
+        // Otherwise, return false;
+        return false;   
+    }
+
+    // This turns cards in the Mine face-up or face-down
+    void SetTableauFaces()
+    {
+        foreach (CardProspector cd in tableau)
+        {
+            bool fup = true;
+            // Check if the cd list of hiddenby is empty (not needed since only those have elements will have this list
+            // if (cd.hiddenBy.Count != 0)
+                // if it is not empty, check the state of the cards in the list
+            foreach (CardProspector tCd in cd.hiddenBy)
+            {
+                if (tCd.state == CardState.tableau)
+                {
+                    fup = false;
+                }
+            }
+
+            cd.faceUp = fup;
+        }
+
+        
     }
 }
