@@ -1,10 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
+// An enum to handle all the possible scoring events
+public enum ScoreEvent
+{
+    draw,
+    mine,
+    mineGold,
+    gameWin,
+    gameLoss
+}
 
 public class Prospector : MonoBehaviour
 {
 
+    public static int SCORE_FROM_PREV_ROUND = 0;
+    public static int HIGH_SCORE = 0;
 
     public static Prospector S;
 
@@ -24,6 +37,8 @@ public class Prospector : MonoBehaviour
     public TextAsset layoutXML;
 
     public List<CardProspector>  drawPile;
+
+    //
 
     void Awake()
     {
@@ -191,6 +206,9 @@ public class Prospector : MonoBehaviour
 
                 break;
         }
+
+        // Check whether the game is over
+        CheckForGameOver();
     }
 
     // Moves the current target to the discardPile
@@ -308,5 +326,54 @@ public class Prospector : MonoBehaviour
         }
 
         
+    }
+
+    // Define the function of CheckForGameOver()
+    void CheckForGameOver()
+    {
+        // Check if the Tableau is gone, if so game is over
+        if (tableau.Count == 0)
+        {
+            // Call gameover with a win
+            GameOver(true);
+        }
+
+        // Check if the drawpile is gone, if not, the game is not over
+        if (drawPile.Count > 0)
+        {
+            return;
+        }
+
+        // If drawpile is gone, check if there is solid move
+        if (drawPile.Count == 0)
+        {
+            foreach (CardProspector card in tableau)
+            {
+                if (AdjacentRank(card, target))
+                {
+                    return; // If there is a valid move, game is no over
+                }
+            }
+
+            // Since there are no valid play, the game is over
+            // Call gameOver with a lose
+            GameOver(false);
+        }
+    }
+
+    // Define the GameOver function, call when the game is over
+    void GameOver(bool won)
+    {
+        if (won)
+        {
+            print("Game Over, You Won! :");
+        }
+        else
+        {
+            print("Game Over, You Lost! :");
+        }
+
+        // Reload the scene, resetting the game
+        SceneManager.LoadScene("__Prospector_Scene_0");
     }
 }
