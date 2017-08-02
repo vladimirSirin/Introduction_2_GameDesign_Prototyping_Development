@@ -38,11 +38,30 @@ public class Prospector : MonoBehaviour
 
     public List<CardProspector>  drawPile;
 
-    //
+    // Fields to track score info
+    public int score = 0;   // the current total score
+
+    public int chainNum = 0;    // the num of cards in this mine chain
+    public int chainScore = 0;  // the total score in current chain
+    public int chainGoldNum = 0;  // The multiplier of goldCard
+
 
     void Awake()
     {
         S = this; // Set up a Singleton for Prospector
+
+        // Check for high score in PlayerPrefs
+        if (PlayerPrefs.HasKey("ProspectorHighScore"))
+        {
+            HIGH_SCORE = PlayerPrefs.GetInt("ProspectorHighScore");
+        }
+
+        // Add the score from last round, which will be >0 if it was a win
+        score += SCORE_FROM_PREV_ROUND;
+
+
+        // Add reset the SCORE_FROM_PREV_ROUND
+        SCORE_FROM_PREV_ROUND = 0;
     }
 
 	// Use this for initialization
@@ -183,6 +202,7 @@ public class Prospector : MonoBehaviour
                 MoveToTarget(Draw());
 
                 UpdateDrawPile();
+                ScoreManager(ScoreEvent.draw);
                 break;
 
             case CardState.tableau:
@@ -203,7 +223,7 @@ public class Prospector : MonoBehaviour
                 MoveToTarget(card); // Make it the new target
                 SetTableauFaces(); // Update tableau card face-
                 
-
+                ScoreManager(ScoreEvent.mine);
                 break;
         }
 
@@ -366,14 +386,81 @@ public class Prospector : MonoBehaviour
     {
         if (won)
         {
-            print("Game Over, You Won! :");
+            ScoreManager(ScoreEvent.gameWin);
         }
         else
         {
-            print("Game Over, You Lost! :");
+            ScoreManager(ScoreEvent.gameLoss);
         }
 
         // Reload the scene, resetting the game
         SceneManager.LoadScene("__Prospector_Scene_0");
+    }
+
+    // ScoreManager handles all of the scoring
+    void ScoreManager(ScoreEvent sEvt)
+    {
+        switch (sEvt)
+        {
+            case ScoreEvent.draw:
+                // Add the chained score into the total one and reset it to zero;
+                score += chainScore * Mathf.RoundToInt(Mathf.Pow(2, chainGoldNum));
+                chainScore = 0;
+                chainNum = 0;
+                chainGoldNum = 0;
+                break;
+
+            case ScoreEvent.mine:
+                // +1 on the chainNum
+                chainNum++;
+                // Add score on the chainScore
+                chainScore += chainNum;
+                break;
+
+            case ScoreEvent.mineGold:
+                // raise the multiplier based on the gold card encountered in this chain
+                chainGoldNum++;
+                chainNum++;
+                break;
+
+            case ScoreEvent.gameWin:
+                // Clear the total score of this round, add the score to PREV_ROUND for next round
+                SCORE_FROM_PREV_ROUND = score;
+                break;
+
+            case ScoreEvent.gameLoss:
+                // Clear the other ones, add all to the total score
+                score += chainScore;
+                break;
+        }
+
+        // Handle the statements of game win and loss
+        switch (sEvt)
+        {
+            case ScoreEvent.gameWin:
+                // if it is a win, add the score to the next round
+                // static fields are NOT reset by Application.LoadLevel()
+                print("You Won this round! Round score: " + score);
+                break;
+
+            case ScoreEvent.gameLoss:
+                // If it is a loss, check against the high score
+                if (Prospector.HIGH_SCORE <= score)
+                {
+                    print("You got the new high score! High score: " + score);
+                    PlayerPrefs.SetInt("ProspectorHighScore", score);
+                }
+                else
+                {
+                    print("Your final score is: "+score);
+
+                }
+                break;
+
+            default:
+                print("score:" + score+" chainNum:" + chainNum+" chainScore:"+chainScore);
+                break;
+        }
+
     }
 }

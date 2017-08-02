@@ -31,7 +31,8 @@ public class Card : MonoBehaviour
     // Virtual Methods can be overridden by subclass methods with the same name
     public virtual void OnMouseUpAsButton()
     {
-        print(name); // When Clicked, this outputs the card name
+
+        //print(name); // When Clicked, this outputs the card name
     }
 
 	// Use this for initialization
