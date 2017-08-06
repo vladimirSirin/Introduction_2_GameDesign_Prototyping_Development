@@ -27,6 +27,7 @@ public class FloatingScore : MonoBehaviour {
     void Awake()
     {
         fsText = gameObject.GetComponent<Text>();
+        gameObject.transform.SetParent(FindObjectOfType<Canvas>().transform);
     }
 
     // The score property also sets scoreString when set
@@ -85,7 +86,7 @@ public class FloatingScore : MonoBehaviour {
 
     // Update is called once per frame
     // SXC: Update is used to deal with the active and post states
-    private void Update()
+    void Update()
     {
         // If this is not moving, just return
         if(state == FSState.idle) return;

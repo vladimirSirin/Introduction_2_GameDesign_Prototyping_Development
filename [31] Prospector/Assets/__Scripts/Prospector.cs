@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 // An enum to handle all the possible scoring events
 public enum ScoreEvent
@@ -19,31 +20,47 @@ public class Prospector : MonoBehaviour
     public static int SCORE_FROM_PREV_ROUND = 0;
     public static int HIGH_SCORE = 0;
 
+    public float reloadDelay = 5.0f; // Time delay before reloading the level
+
     public static Prospector S;
 
+    // Fields for deck building and layouting
     public Deck deck;
-
     public TextAsset deckXML;
     public Vector3 layoutCentre;
     public float xOffset = 3;
     public float yOffset = -2.5f;
     public Transform layoutAnchor;
 
+    // Fields for game logic and layout
     public CardProspector target;
     public List<CardProspector> tableau;
     public List<CardProspector> discardPile;
-
+    public List<CardProspector>  drawPile;
     public Layout layout;
     public TextAsset layoutXML;
 
-    public List<CardProspector>  drawPile;
-
     // Fields to track score info
     public int score = 0;   // the current total score
-
     public int chainNum = 0;    // the num of cards in this mine chain
     public int chainScore = 0;  // the total score in current chain
     public int chainGoldNum = 0;  // The multiplier of goldCard
+
+    // Fields for the floatingScore and scoreboard (UI)
+    private static readonly float _SCREEN_W = Screen.width;
+    private static readonly float _SCREEN_H = Screen.height;
+
+    public Vector3 fsPosMid = new Vector3(0.5f, 0.90f, 0);
+    public Vector3 fsPosRun = new Vector3(0.5f, 0.75f, 0);
+    public Vector3 fsPosMid2 = new Vector3(0.5f, 0.5f, 0);
+    public Vector3 fsPosEnd;
+
+    public FloatingScore fsRun;
+
+    // The GameOver and RoundResult UI
+    public Text gameOverUI;
+    public Text roundResultUI;
+    public Text highScoreUI;
 
 
     void Awake()
@@ -62,6 +79,7 @@ public class Prospector : MonoBehaviour
 
         // Add reset the SCORE_FROM_PREV_ROUND
         SCORE_FROM_PREV_ROUND = 0;
+
     }
 
 	// Use this for initialization
@@ -80,6 +98,29 @@ public class Prospector : MonoBehaviour
 
 	    drawPile = cardListToCardProspectorsList(deck.cards);
 	    LayoutGame();
+
+	    Scoreboard.S.score = score;
+
+	    // Normalize the points
+	    fsPosMid.x *= _SCREEN_W;
+	    fsPosMid.y *= _SCREEN_H;
+	    fsPosRun.x *= _SCREEN_W;
+	    fsPosRun.y *= _SCREEN_H;
+	    fsPosMid2.x *= _SCREEN_W;
+	    fsPosMid2.y *= _SCREEN_H;
+	    fsPosEnd = Scoreboard.S.transform.position;
+
+        // Find the text game objects
+	    gameOverUI = GameObject.Find("GameOver").GetComponent<Text>();
+	    roundResultUI = GameObject.Find("RoundResult").GetComponent<Text>();
+	    highScoreUI = GameObject.Find("HighScore").GetComponent<Text>();
+
+        // Setting the high score if there is any
+	    highScoreUI.text = "High Score: " + Utils.AddCommasToNumber(HIGH_SCORE);
+
+        // Set the game over feedbacks invisible at beginning
+       ShowResultUI(false);
+
 	}
 	
 	// Update is called once per frame
@@ -393,13 +434,17 @@ public class Prospector : MonoBehaviour
             ScoreManager(ScoreEvent.gameLoss);
         }
 
-        // Reload the scene, resetting the game
-        SceneManager.LoadScene("__Prospector_Scene_0");
+        // Invoke the reloadlevel function
+        // Delay will give the score time to travel
+        Invoke("ReloadLevel", reloadDelay);
     }
 
     // ScoreManager handles all of the scoring
     void ScoreManager(ScoreEvent sEvt)
     {
+
+        List<Vector3> fsPts;
+
         switch (sEvt)
         {
             case ScoreEvent.draw:
@@ -441,18 +486,26 @@ public class Prospector : MonoBehaviour
                 // if it is a win, add the score to the next round
                 // static fields are NOT reset by Application.LoadLevel()
                 print("You Won this round! Round score: " + score);
+
+                gameOverUI.text = "Round Over";
+                roundResultUI.text = "You have won this round!\n Round Score: " + score;
+                ShowResultUI(true);
                 break;
 
             case ScoreEvent.gameLoss:
                 // If it is a loss, check against the high score
+                gameOverUI.text = "Game Over";
                 if (Prospector.HIGH_SCORE <= score)
                 {
                     print("You got the new high score! High score: " + score);
                     PlayerPrefs.SetInt("ProspectorHighScore", score);
+                    roundResultUI.text = "You got the high score!\n High Score: " + score;
                 }
                 else
                 {
                     print("Your final score is: "+score);
+                    roundResultUI.text = "Your final score was: " + score;
+                    ShowResultUI(true);
 
                 }
                 break;
@@ -462,5 +515,76 @@ public class Prospector : MonoBehaviour
                 break;
         }
 
+        // Handle the scoring show to player
+        switch (sEvt)
+        {
+                case ScoreEvent.draw:
+                case ScoreEvent.gameWin:
+                case ScoreEvent.gameLoss:
+                    // adding the chain score to the scoreboard
+                    if (fsRun != null)
+                    {
+                        // Check if there is a started run.
+                        // If there is, make the bezier list for score moving
+                        fsPts = new List<Vector3>();
+                        fsPts.Add(fsPosRun);
+                        fsPts.Add(fsPosMid2);
+                        fsPts.Add(fsPosEnd);
+                        fsRun.reportFinishTo = Scoreboard.S.gameObject;
+                        fsRun.Init(fsPts, 0, 1);
+                    
+                        // Change the font too.
+                        fsRun.fontSize = new List<float>(new float[]{28, 36, 4});
+                        fsRun = null; // Clear fsRun so it is created again
+                    }
+                    break;
+
+                case ScoreEvent.mine:
+                case ScoreEvent.mineGold:
+                    // When mining, adding up the score in fsRun
+                    FloatingScore fs;
+
+                    // Moving it from the mousePosition to fsPosRun
+                    fsPts = new List<Vector3>();
+                    Vector3 p0 = Input.mousePosition;
+                    //p0.x /= Screen.width;
+                    //p0.y /= Screen.height;
+                    fsPts.Add(p0);
+                    fsPts.Add(fsPosMid);
+                    fsPts.Add(fsPosRun);
+
+                    fs = Scoreboard.S.CreateFloatingScore(chainNum, fsPts);
+
+                    fs.fontSize = new List<float>(new float[]{4, 50, 28});
+
+                    if (fsRun == null)
+                    {
+                        fsRun = fs;
+                        fsRun.reportFinishTo = null;
+                    }
+                    else
+                    {
+                        fs.reportFinishTo = fsRun.gameObject;
+                    }
+                    break;
+
+
+
+        }
+
+    }
+
+    // function to reload the level
+    void ReloadLevel()
+    {
+        // Reload the scene, resetting the game
+        SceneManager.LoadScene("__Prospector_Scene_0");
+    }
+
+    // Function to show or hide the UI text of game over / round / highscore
+    void ShowResultUI(bool show)
+    {
+        gameOverUI.gameObject.SetActive(show);
+        roundResultUI.gameObject.SetActive(show);
     }
 }
