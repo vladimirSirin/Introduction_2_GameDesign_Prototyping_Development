@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\GE72\.Rider2018.1\system\resharper-host\local\Transient\ReSharperHost\v12\SolutionCaches\_[32] Bartok.-1310892158.00" t="ExcludeRecursive" />
+    <e p="E:\SourceTree\Introduction_2_GD_Proto_Dev\[32] Bartok" t="IncludeRecursive">
+      <e p="[32] Bartok.sln" t="IncludeFlat" />
+      <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
+      <e p="Assets\__Scripts" t="Include">
+        <e p="Bartok.cs" t="Include" />
+        <e p="Card.cs" t="Include" />
+        <e p="CardBartok.cs" t="Include" />
+        <e p="CardProspector.cs" t="Include" />
+        <e p="Deck.cs" t="Include" />
+        <e p="FloatingScore.cs" t="Include" />
+        <e p="Layout.cs" t="Include" />
+        <e p="Prospector.cs" t="Include" />
+        <e p="PT_XMLReader.cs" t="Include" />
+        <e p="Scoreboard.cs" t="Include" />
+        <e p="Utils.cs" t="Include" />
+      </e>
+      <e p="Assets\Resources" t="Include">
+        <e p="DeckXML.xml" t="Include" />
+        <e p="LayoutXML.xml" t="Include" />
+      </e>
+      <e p="Library" t="ExcludeRecursive" />
+      <e p="obj" t="ExcludeRecursive" />
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="Temp" t="ExcludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+      </e>
+    </e>
+  </component>
+</project>
